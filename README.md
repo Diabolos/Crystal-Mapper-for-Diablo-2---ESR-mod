@@ -12,6 +12,27 @@
 
 Crystal Mapper provides a clean, browser-based UI that maps crystals and their containing ores to specific monsters, sourced directly from the mod's data files.
 
+Select one or more crystals and the results panel will automatically sort by highest drop count.
+
+> ⚠️ This is not perfect — just something thrown together to help folks out! 🙂
+
+---
+
+## 🎬 Preview
+
+<div align="center">
+
+https://github.com/user-attachments/assets/8e9b8ac8-6e89-4616-ab49-3b1b7e869104
+
+</div>
+
+---
+
+## 🚀 How To Use
+
+1. Download the HTML file from this repository
+2. Run it on your local machine by opening it in any web browser
+
 ---
 
 ## 📂 Data Sources
