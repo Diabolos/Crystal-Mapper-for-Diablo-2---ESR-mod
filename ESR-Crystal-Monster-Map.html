@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESR Crystal Drop Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  :root {
+    --bg: #0a0806;
+    --bg2: #12100d;
+    --bg3: #1a1612;
+    --border: #3a2e1e;
+    --border2: #5a4a2a;
+    --gold: #c9a84c;
+    --gold2: #e8c96a;
+    --gold3: #f5e0a0;
+    --red: #8b2020;
+    --red2: #c0392b;
+    --text: #d4c4a0;
+    --text2: #a09070;
+    --text3: #6a5a40;
+    --crystal-0: #4ae0e0;
+    --crystal-1: #4ab0e0;
+    --crystal-2: #6a60e0;
+    --crystal-3: #a050d0;
+    --crystal-4: #e050a0;
+    --crystal-5: #e06040;
+    --crystal-6: #e09030;
+    --crystal-7: #c0c030;
+    --crystal-8: #60c040;
+    --crystal-9: #40c090;
+    --crystal-10: #40a0c0;
+    --crystal-11: #8080e0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(90,60,20,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(60,30,10,0.2) 0%, transparent 50%);
+  }
+
+  header {
+    border-bottom: 1px solid var(--border2);
+    padding: 28px 40px 20px;
+    background: linear-gradient(180deg, rgba(30,20,10,0.8) 0%, transparent 100%);
+    display: flex;
+    align-items: flex-end;
+    gap: 24px;
+  }
+
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold2);
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 30px rgba(200,160,60,0.4);
+    line-height: 1;
+  }
+
+  header .subtitle {
+    font-size: 0.95rem;
+    color: var(--text3);
+    font-style: italic;
+    padding-bottom: 3px;
+  }
+
+  .main-layout {
+    display: flex;
+    height: calc(100vh - 80px);
+  }
+
+  /* === SIDEBAR === */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--bg2);
+  }
+
+  .file-zone {
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .file-zone:hover, .file-zone.drag-over {
+    border-color: var(--gold);
+    background: rgba(200,160,60,0.05);
+  }
+  .file-zone.loaded {
+    border-style: solid;
+    border-color: var(--gold);
+    background: rgba(200,160,60,0.06);
+  }
+  .file-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .file-zone .fz-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .file-zone .fz-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .file-zone .fz-status {
+    font-size: 0.8rem;
+    color: var(--text3);
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .file-zone.loaded .fz-status { color: #70b070; }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--text3);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  .search-box {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { border-color: var(--gold); }
+  .search-box::placeholder { color: var(--text3); font-style: italic; }
+
+  .filter-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .filter-tab {
+    flex: 1;
+    padding: 5px 4px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text3);
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    text-align: center;
+  }
+  .filter-tab:hover { border-color: var(--border2); color: var(--text2); }
+  .filter-tab.active { background: rgba(200,160,60,0.15); border-color: var(--gold); color: var(--gold); }
+
+  /* Crystal legend */
+  .crystal-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .crystal-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+  .crystal-legend-item:hover { background: rgba(255,255,255,0.04); }
+  .crystal-legend-item.filtered { opacity: 0.35; }
+  .crystal-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .crystal-name {
+    font-size: 0.85rem;
+    color: var(--text2);
+  }
+  .crystal-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--text3);
+  }
+
+  /* === MAIN CONTENT === */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 32px;
+  }
+
+  .welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+    text-align: center;
+  }
+  .welcome h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  .welcome p {
+    color: var(--text2);
+    max-width: 480px;
+    line-height: 1.7;
+    font-size: 1.05rem;
+  }
+  .welcome .steps {
+    text-align: left;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px 20px;
+    max-width: 420px;
+  }
+  .welcome .steps ol {
+    list-style: none;
+    counter-reset: steps;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .welcome .steps ol li {
+    counter-increment: steps;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    color: var(--text2);
+  }
+  .welcome .steps ol li::before {
+    content: counter(steps);
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    background: rgba(200,160,60,0.12);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Results */
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .results-header h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: var(--gold2);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  .results-count {
+    font-size: 0.85rem;
+    color: var(--text3);
+    font-style: italic;
+  }
+
+  /* Monster cards */
+  .monster-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .monster-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .monster-card:hover { border-color: var(--border2); }
+
+  .monster-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    gap: 12px;
+    user-select: none;
+  }
+  .monster-header:hover { background: rgba(255,255,255,0.02); }
+
+  .monster-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .monster-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--gold3);
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .monster-tc {
+    font-size: 0.75rem;
+    color: var(--text3);
+    font-style: italic;
+  }
+
+  .monster-crystals-preview {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .crystal-pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .monster-expand {
+    font-size: 0.7rem;
+    color: var(--text3);
+    transition: transform 0.2s;
+    margin-left: 6px;
+  }
+  .monster-card.open .monster-expand { transform: rotate(180deg); }
+
+  .monster-drops {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .monster-card.open .monster-drops { display: block; }
+
+  .drop-group {
+    margin-top: 12px;
+  }
+  .drop-group-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .ore-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  .ore-name {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--gold);
+    min-width: 90px;
+    margin-top: 2px;
+  }
+
+  .ore-crystals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .crystal-tag {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 0.78rem;
+    border: 1px solid;
+  }
+  .crystal-tag.primary {
+    font-weight: 600;
+  }
+  .crystal-tag.secondary {
+    opacity: 0.7;
+  }
+
+  .crystal-tag .qty {
+    font-size: 0.65rem;
+    opacity: 0.75;
+    font-style: italic;
+  }
+
+  /* Crystal view */
+  .crystal-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .crystal-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .crystal-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .crystal-section-header .crystal-dot-lg {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  .crystal-section-header h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    color: var(--gold3);
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .crystal-section-body {
+    padding: 12px 16px;
+  }
+
+  .monster-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .monster-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    font-size: 0.82rem;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .monster-tag:hover {
+    border-color: var(--gold);
+    color: var(--gold3);
+  }
+  .monster-tag .primary-indicator {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* Ore view */
+  .ore-view-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .ore-view-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--gold2);
+  }
+  .ore-view-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ore-view-crystals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .ore-view-monsters {
+    margin-top: 6px;
+    font-size: 0.82rem;
+    color: var(--text3);
+  }
+  .ore-view-monsters span {
+    color: var(--text2);
+  }
+
+  .empty-state {
+    padding: 40px;
+    text-align: center;
+    color: var(--text3);
+    font-style: italic;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+  .badge {
+    background: rgba(200,160,60,0.15);
+    border: 1px solid rgba(200,160,60,0.3);
+    color: var(--gold);
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    padding: 1px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .tc-chain {
+    font-size: 0.75rem;
+    color: var(--text3);
+    margin-top: 4px;
+    font-style: italic;
+  }
+  .tc-chain span { color: var(--text2); }
+</style>
+<style>
+/* === Area view styles === */
+.area-view { display: flex; flex-direction: column; gap: 12px; }
+.area-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
+.area-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; cursor: pointer;
+  transition: background 0.15s;
+}
+.area-header:hover { background: rgba(255,255,255,0.02); }
+.area-icon { font-size: 1.1rem; }
+.area-name { flex: 1; font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--gold2); font-weight: 600; }
+.area-ore-count { font-size: 0.75rem; color: var(--text3); margin-right: 8px; }
+.area-expand { color: var(--text3); font-size: 0.7rem; transition: transform 0.2s; }
+.area-card.open .area-expand { transform: rotate(180deg); }
+.area-drops { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+.area-card.open .area-drops { display: block; }
+.special-ore-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: var(--gold)20;
+  border: 1px solid var(--gold)50;
+  color: var(--gold2);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.area-monsters { margin-top: 10px; }
+.area-monster-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.area-monster-tag {
+  font-size: 0.72rem; color: var(--text2); padding: 2px 7px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 3px; cursor: pointer; transition: border-color 0.15s;
+}
+.area-monster-tag:hover { border-color: var(--border2); color: var(--text); }
+.act-header {
+  font-family: 'Cinzel', serif; font-size: 0.7rem; font-weight: 600;
+  color: var(--text3); letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 18px 0 8px; border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="main-layout">
+  <aside class="sidebar">
+    <div>
+      <header style="padding:20px 0 0;border:none;background:none;display:block">
+        <h1 style="font-family:'Cinzel',serif;font-size:1.3rem;font-weight:900;color:var(--gold2);letter-spacing:0.08em">ESR Crystal Map</h1>
+        <div style="font-size:0.78rem;color:var(--text3);font-style:italic;margin-top:4px">Eastern Sun Resurrected</div>
+      </header>
+    </div>
+
+    <div>
+      <div class="section-title">Search</div>
+      <input class="search-box" id="search" type="text" placeholder="Monster, area, or crystal…" oninput="applyFilters()">
+    </div>
+
+    <div>
+      <div class="section-title">View By</div>
+      <div class="filter-tabs">
+        <div class="filter-tab active" onclick="setView('monster')">Monster</div>
+        <div class="filter-tab" onclick="setView('crystal')">Crystal</div>
+        <div class="filter-tab" onclick="setView('ore')">Ore</div>
+        <div class="filter-tab" onclick="setView('area')">Area</div>
+      </div>
+    </div>
+
+    <div id="crystal-legend-section">
+      <div class="section-title">Crystals <span style="float:right;cursor:pointer;color:var(--text3)" onclick="resetCrystalFilter()">reset</span></div>
+      <div class="crystal-legend" id="crystal-legend"></div>
+    </div>
+  </aside>
+
+  <main class="content" id="content">
+    <div class="welcome"><h2>⛏ Loading…</h2></div>
+  </main>
+</div>
+
+<script>
+// ============================================================
+// EMBEDDED DATA
+// ============================================================
+const EMBEDDED = {"crystalInfo":{"xtal-00":{"name":"Frozen Soul","color":"#9a8fef"},"xtal-01":{"name":"Shadow Quartz","color":"#8f8f8f"},"xtal-02":{"name":"Bleeding Stone","color":"#ea8186"},"xtal-03":{"name":"Burning Sulphur","color":"#ffffc0"},"xtal-04":{"name":"Dark Azurite","color":"#9991f4"},"xtal-05":{"name":"Bitter Peridot","color":"#2d8838"},"xtal-06":{"name":"Pulsing Opal","color":"#e5ddb6"},"xtal-07":{"name":"Enigmatic Cinnabar","color":"#f17688"},"xtal-08":{"name":"Tomb Jade","color":"#60c067"},"xtal-09":{"name":"Solid Mercury","color":"#e0e0e0"},"xtal-10":{"name":"Storm Amber","color":"#efc066"},"xtal-11":{"name":"Tainted Tourmaline","color":"#b90efb"}},"oreData":[{"name":"Uni Ore 0","crystals":[{"stat":"xtal-00","min":2,"max":4},{"stat":"xtal-01","min":0,"max":1},{"stat":"xtal-02","min":0,"max":1},{"stat":"xtal-03","min":0,"max":1}]},{"name":"Uni Ore 1","crystals":[{"stat":"xtal-01","min":2,"max":4},{"stat":"xtal-02","min":0,"max":1},{"stat":"xtal-03","min":0,"max":1},{"stat":"xtal-04","min":0,"max":1}]},{"name":"Uni Ore 2","crystals":[{"stat":"xtal-02","min":2,"max":4},{"stat":"xtal-03","min":0,"max":1},{"stat":"xtal-04","min":0,"max":1},{"stat":"xtal-05","min":0,"max":1}]},{"name":"Uni Ore 3","crystals":[{"stat":"xtal-03","min":2,"max":4},{"stat":"xtal-04","min":0,"max":1},{"stat":"xtal-05","min":0,"max":1},{"stat":"xtal-06","min":0,"max":1}]},{"name":"Uni Ore 4","crystals":[{"stat":"xtal-04","min":2,"max":4},{"stat":"xtal-05","min":0,"max":1},{"stat":"xtal-06","min":0,"max":1},{"stat":"xtal-07","min":0,"max":1}]},{"name":"Uni Ore 5","crystals":[{"stat":"xtal-05","min":2,"max":4},{"stat":"xtal-06","min":0,"max":1},{"stat":"xtal-07","min":0,"max":1},{"stat":"xtal-08","min":0,"max":1}]},{"name":"Uni Ore 6","crystals":[{"stat":"xtal-06","min":2,"max":4},{"stat":"xtal-07","min":0,"max":1},{"stat":"xtal-08","min":0,"max":1},{"stat":"xtal-09","min":0,"max":1}]},{"name":"Uni Ore 7","crystals":[{"stat":"xtal-07","min":2,"max":4},{"stat":"xtal-08","min":0,"max":1},{"stat":"xtal-09","min":0,"max":1},{"stat":"xtal-10","min":0,"max":1}]},{"name":"Uni Ore 8","crystals":[{"stat":"xtal-08","min":2,"max":4},{"stat":"xtal-09","min":0,"max":1},{"stat":"xtal-10","min":0,"max":1},{"stat":"xtal-11","min":0,"max":1}]},{"name":"Uni Ore 9","crystals":[{"stat":"xtal-09","min":2,"max":4},{"stat":"xtal-10","min":0,"max":1},{"stat":"xtal-11","min":0,"max":1},{"stat":"xtal-00","min":0,"max":1}]},{"name":"Uni Ore 10","crystals":[{"stat":"xtal-10","min":2,"max":4},{"stat":"xtal-11","min":0,"max":1},{"stat":"xtal-00","min":0,"max":1},{"stat":"xtal-01","min":0,"max":1}]},{"name":"Uni Ore 11","crystals":[{"stat":"xtal-11","min":2,"max":4},{"stat":"xtal-00","min":0,"max":1},{"stat":"xtal-01","min":0,"max":1},{"stat":"xtal-02","min":0,"max":1}]},{"name":"Uni Ore 12","crystals":[{"stat":"xtal-00","min":0,"max":1},{"stat":"xtal-01","min":0,"max":1},{"stat":"xtal-02","min":0,"max":1},{"stat":"xtal-03","min":0,"max":1},{"stat":"xtal-04","min":0,"max":1},{"stat":"xtal-05","min":0,"max":1}]},{"name":"Uni Ore 13","crystals":[{"stat":"xtal-06","min":0,"max":1},{"stat":"xtal-07","min":0,"max":1},{"stat":"xtal-08","min":0,"max":1},{"stat":"xtal-09","min":0,"max":1},{"stat":"xtal-10","min":0,"max":1},{"stat":"xtal-11","min":0,"max":1}]},{"name":"Uni Ore 14","crystals":[{"stat":"xtal-00","min":0,"max":1},{"stat":"xtal-02","min":0,"max":1},{"stat":"xtal-04","min":0,"max":1},{"stat":"xtal-06","min":0,"max":1},{"stat":"xtal-08","min":0,"max":1},{"stat":"xtal-10","min":0,"max":1}]},{"name":"Uni Ore 15","crystals":[{"stat":"xtal-01","min":0,"max":1},{"stat":"xtal-03","min":0,"max":1},{"stat":"xtal-05","min":0,"max":1},{"stat":"xtal-07","min":0,"max":1},{"stat":"xtal-09","min":0,"max":1},{"stat":"xtal-11","min":0,"max":1}]}],"monsterData":{"quillrat1":{"name":"Quill Rat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer1":{"name":"Dark Spearwoman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"brute1":{"name":"Gargantuan Beast","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zombie1":{"name":"Zombie","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skeleton1":{"name":"Skeleton","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallen1":{"name":"Fallen","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptrogue1":{"name":"Dark Hunter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zombie2":{"name":"Hungry Dead","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillrat2":{"name":"Spike Fiend","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_archer1":{"name":"Dark Ranger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer1":{"name":"Skeleton Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"foulcrow1":{"name":"Foul Crow","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman1":{"name":"Fallen Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer2":{"name":"Vile Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead3":{"name":"Misshapen","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"brute2":{"name":"Brute","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillbear1":{"name":"Quill Bear","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_archer2":{"name":"Vile Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith1":{"name":"Ghost","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptrogue2":{"name":"Vile Hunter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"crownest1":{"name":"Foul Crow Nest","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman1":{"name":"Moon Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_archer3":{"name":"Dark Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallen2":{"name":"Carver","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skeleton2":{"name":"Returned","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skeleton3":{"name":"Bone Warrior","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatlord1":{"name":"Moon Clan Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptrogue3":{"name":"Dark Stalker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishblow1":{"name":"Rat Man","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillrat3":{"name":"Thorn Beast","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer2":{"name":"Returned Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_archer4":{"name":"Black Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallen3":{"name":"Devilkin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"brute3":{"name":"Yeti","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer3":{"name":"Dark Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman2":{"name":"Carver Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer4":{"name":"Black Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman3":{"name":"Devilkin Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_fire1":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith2":{"name":"Wraith","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"arach1":{"name":"Arach","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_ltng1":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatlord2":{"name":"Night Clan Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_pois1":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_cold1":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"crownest2":{"name":"Blood Hawk Nest","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman2":{"name":"Night Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillrat4":{"name":"Razor Spine","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillbear2":{"name":"Spike Giant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_cold2":{"name":"Bone Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_fire2":{"name":"Bone Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_ltng2":{"name":"Bone Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer3":{"name":"Bone Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallen4":{"name":"Dark One","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_pois2":{"name":"Bone Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zombie3":{"name":"Ghoul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"foulcrow2":{"name":"Blood Hawk","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"rhino1":{"name":"Tomb Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead4":{"name":"Disfigured","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish1":{"name":"Undead  Rat Man","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper1":{"name":"Tomb Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ravenimp":{"name":"Raven  Imp","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer9":{"name":"Returned Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ravenshaman":{"name":"Raven  Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"darkcrusher":{"name":"Dark  Crusher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptrogue4":{"name":"Black Rogue","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman4":{"name":"Dark Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skeleton4":{"name":"Burning Dead","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mummy1":{"name":"Dried Corpse","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"braven_clone":{"name":"Bloodraven","ores":["Uni Ore 11"]},"goatlord3":{"name":"Blood Clan Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead1":{"name":"Afflicted","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman3":{"name":"Blood Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire5":{"name":"Banished","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetish1":{"name":"Rat Man","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer4":{"name":"Burning Dead Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skeleton5":{"name":"Horror","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandleaper2":{"name":"Cave Leaper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vulture1":{"name":"Carrion Bird","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillbear3":{"name":"Thorn Brute","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandleaper1":{"name":"Sand Leaper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_pois3":{"name":"Burning Dead Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_fire3":{"name":"Burning Dead Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_cold3":{"name":"Baal Cold Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_ltng3":{"name":"Burning Dead Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pantherwoman1":{"name":"Huntress","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire1":{"name":"Ghoul Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"swarm1":{"name":"Itchies","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"brute4":{"name":"Crusher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"brute5":{"name":"Wailing Beast","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandleaper3":{"name":"Tomb Creeper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith3":{"name":"Specter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger1":{"name":"Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"flyingscimitar":{"name":"Flying Scimitar","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatlord5":{"name":"Death Clan Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman5":{"name":"Death Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper2":{"name":"Claw Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider1":{"name":"Sand Raider","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"claygolemmon":{"name":"Mud Golem","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"arach2":{"name":"Sand Fisher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon1":{"name":"Desert Wing","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blackknight1":{"name":"Black Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead2":{"name":"Tainted","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"foulcrow3":{"name":"Black Raptor","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overlord1":{"name":"Over Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellbovine":{"name":"Hell  Bovine","ores":["Uni Ore 10"]},"hellbovine3":{"name":"Hell  Bovine","ores":["Uni Ore 10"]},"milkmaiden":{"name":"Cow Witch","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellbovine2":{"name":"Hell  Bovine","ores":["Uni Ore 10"]},"blackknight5":{"name":"Death Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandmaggot1":{"name":"Sand Maggot","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon2":{"name":"Fiend","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pantherwoman2":{"name":"Saber Cat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper3":{"name":"Salamander","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith4":{"name":"Apparition","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger2":{"name":"Spear Cat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mummy3":{"name":"Embalmed","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vulture2":{"name":"Undead Scavenger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger5":{"name":"Spear Cat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blunderbore2":{"name":"Gorbelly","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider3":{"name":"Invader","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"swarm2":{"name":"Black Locusts","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"arach3":{"name":"Poison Spinner","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger3":{"name":"Night Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"crownest4":{"name":"Cloud Stalker Nest","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandmaggot3":{"name":"Devourer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandmaggot2":{"name":"Rock Worm","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mosquito1":{"name":"Sucker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pantherwoman3":{"name":"Night Tiger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellcowboy1":{"name":"Hell  Cowboy","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellcowboy2":{"name":"Hell  Cowboy","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cowfly":{"name":"Cow  Fly","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellcowboy3":{"name":"Hell  Cowboy","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"foulcrow4":{"name":"Cloud Stalker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"thornhulk2":{"name":"Bramble Hulk","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mummy4":{"name":"Preserved Dead","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"swarm3":{"name":"Plague Bugs","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper5":{"name":"Serpent Magus","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler4":{"name":"Horadrim  Ancient","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper4":{"name":"Pit Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vulture4":{"name":"Winged Nightmare","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pantherwoman4":{"name":"Hell Cat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger6":{"name":"Night Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zombie5":{"name":"Plague Bearer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler3":{"name":"Unraveler","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler1":{"name":"Hollow One","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler2":{"name":"Guardian","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp1":{"name":"Gloam","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"scarab4":{"name":"Steel Weevil","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"baboon1":{"name":"Dune Beast","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger4":{"name":"Hell Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"thornhulk1":{"name":"Thorned Hulk","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith5":{"name":"Dark Shape","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer5":{"name":"Horror Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_ltng4":{"name":"Horror Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_fire4":{"name":"Horror Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_pois4":{"name":"Horror Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_cold4":{"name":"Horror Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blunderbore1":{"name":"Blunderbore","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"chaosmage3":{"name":"Chaos  Lightning  Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"chaosmage2":{"name":"Chaos  Flame  Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"chaosmage1":{"name":"Chaos  Ice  Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"chaossummoner":{"name":"Chaos  Summoner","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"rhino2":{"name":"Claw Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish2":{"name":"Undead  Fetish","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider2":{"name":"Marauder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodgolemmon":{"name":"Blood Golem","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"summoner_clone2":{"name":"Dark  Magician","ores":["Uni Ore 7"]},"summoner_clone1":{"name":"Dark  Magician","ores":["Uni Ore 7"]},"fetish2":{"name":"Fetish","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandmaggot4":{"name":"Giant Lamprey","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishblow2":{"name":"Fetish","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"scarab3":{"name":"Scarab","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"andariel_clone":{"name":"Andariel","ores":["Uni Ore 5"]},"clawviper9":{"name":"Tomb Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vilemother4":{"name":"Grotesque","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hairdresser":{"name":"Hairdresser","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman4":{"name":"Hell Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overlord2":{"name":"Mud Man","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blackknight2":{"name":"Doom Guard","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zombie4":{"name":"Drowned Carcass","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandmaggot5":{"name":"World Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandleaper4":{"name":"Tree Lurker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider4":{"name":"Infidel","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mosquito2":{"name":"Feeder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zealot2":{"name":"Faithful","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"arach4":{"name":"Flame Spider","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"swarm4":{"name":"Hell Swarm","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"dozaemon":{"name":"Dozaemon","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathstinger":{"name":"Death  Stinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"soullessarcher":{"name":"Soulless  Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"duriel_clone":{"name":"Duriel","ores":["Uni Ore 4"]},"blacksoul":{"name":"Black  Soul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"livingmaul":{"name":"Living  Maul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish3":{"name":"Undead  Flayer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetish3":{"name":"Flayer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish5":{"name":"Undead  Stygian Doll","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishshaman3":{"name":"Flayer Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishshaman5":{"name":"Stygian Doll Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishshaman4":{"name":"Soul Killer Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon3":{"name":"Gloombat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frogdemon1":{"name":"Swamp  Dweller","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blunderbore3":{"name":"Mauler","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mummy5":{"name":"Cadaver","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frogdemon3":{"name":"Slime  Prince","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"thornhulk3":{"name":"Thrasher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"baboon5":{"name":"Temple Guard","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetish5":{"name":"Stygian Doll","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"baboon4":{"name":"Doom Ape","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"arach5":{"name":"Spider Magus","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishblow4":{"name":"Soul Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mosquito4":{"name":"Blood Wing","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetish4":{"name":"Soul Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish4":{"name":"Undead  Soul Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vulture3":{"name":"Hell Buzzard","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp3":{"name":"Burning Soul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"thornhulk4":{"name":"Spikefist","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptrogue5":{"name":"Flesh Hunter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire2":{"name":"Night Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cantor3":{"name":"Heirophant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"irongolemmon":{"name":"Iron Golem","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zealot1":{"name":"Zakarumite","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cantor2":{"name":"Cantor","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire4":{"name":"Blood Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon4":{"name":"Blood Diver","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"zealot3":{"name":"Zealot","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"baboon6":{"name":"Night Marauder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire3":{"name":"Dark Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cantor4":{"name":"Heirophant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sorrowsummoner":{"name":"Sorrow  Summoner","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"darkharpie":{"name":"Dark  Harpie","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hephasto_clone":{"name":"Dark  Clone","ores":["Uni Ore 6"]},"willowisp2":{"name":"Swamp Ghost","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"scarab5":{"name":"Albino Roach","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mindsucker":{"name":"Mind  Sucker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"acupuncturist":{"name":"Acupuncturist","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"maneater":{"name":"Maneater","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"twisted":{"name":"Twisted","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"tramplespider":{"name":"Trample  Spider","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubus7":{"name":"Hell  Temptress","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch6":{"name":"Dominus","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubus6":{"name":"Succubusexp","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch7":{"name":"Hell  Witch","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"baboon3":{"name":"Jungle Hunter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frogdemon2":{"name":"Bog  Creature","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sarinasmaiden":{"name":"Sarinas  Maiden","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blackknight3":{"name":"Steel Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman6":{"name":"Moon Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overlord3":{"name":"Toad Demon","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fingermage1":{"name":"Groper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vilemother1":{"name":"Flesh Spawner","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"regurgitator2":{"name":"Corpse Spitter","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blackknight4":{"name":"Blood Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandleaper5":{"name":"Razor Pit Demon","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"rhino4":{"name":"Pit Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"firegolemmon":{"name":"Fire Golem","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"doomknight1":{"name":"Doom Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"megademon3":{"name":"Venom Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"regurgitator1":{"name":"Corpulent","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillbear5":{"name":"Giant Urchin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp4":{"name":"Black Soul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallen5":{"name":"Warped Fallen","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider5":{"name":"Assailant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman5":{"name":"Warped Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fingermage2":{"name":"Strangler","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"regurgitator3":{"name":"Maw Fiend","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"doomknight2":{"name":"Abyss Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"megademon1":{"name":"Balrog","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead5":{"name":"Damned","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"megademon2":{"name":"Pit Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vilemother2":{"name":"Stygian Hag","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overlord4":{"name":"Flayed One","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatlord6":{"name":"Death Clan Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon5":{"name":"Dark Familiar","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vilemother3":{"name":"Grotesque","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"belhifet1":{"name":"Belhifet","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blunderbore4":{"name":"Urdar","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"doomknight3":{"name":"Oblivion Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"beholder":{"name":"Beholder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fingermage3":{"name":"Storm Caster","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer6":{"name":"Burning Dead Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"foulcrow5":{"name":"Foul Crow","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"imp1":{"name":"Imp1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bighead6":{"name":"Afflicted","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overseer1":{"name":"Over Seer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vulture5":{"name":"Carrion Bird","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"thornhulk5":{"name":"Thorned Hulk","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion1":{"name":"Minionexp","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathmauler1":{"name":"Death  Mauler1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger7":{"name":"Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quillrat6":{"name":"Quill Rat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathmauler2":{"name":"Death  Mauler2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overseer2":{"name":"Lasher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer6":{"name":"Vile Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"siegebeast2":{"name":"Crush Biest","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion2":{"name":"Slayerexp","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cyclops1":{"name":"Cyclops","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"imp3":{"name":"Imp3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"blunderbore5":{"name":"Blunderbore","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"siegebeast1":{"name":"Siege  Beast","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger8":{"name":"Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_archer6":{"name":"Vile Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"siegebeast3":{"name":"Blood Bringer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion4":{"name":"Fire Boar","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_fire5":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fallenshaman6":{"name":"Carver Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman7":{"name":"Night Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overseer5":{"name":"Hell Whip","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_ltng5":{"name":"Returned Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slinger9":{"name":"Slinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion3":{"name":"Ice Boar","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overseer3":{"name":"Over Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathmauler3":{"name":"Death  Mauler3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"treant":{"name":"Treant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"automaton":{"name":"Automaton","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pestilencerat":{"name":"Pestilence  Rat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"grimalkin":{"name":"Grimalkin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ghastlyhorseman":{"name":"Ghastly  Horseman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper6":{"name":"Claw Viper","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"reanimatedhorde1":{"name":"Rot Walker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_cold5":{"name":"Bone Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubus5":{"name":"Blood  Temptress","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp5":{"name":"Gloam","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frozenhorror1":{"name":"Frozen  Horror1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"snowyeti1":{"name":"Snow Yeti1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer7":{"name":"Dark Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frozenhorror2":{"name":"Frozen  Horror2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"wraith6":{"name":"Ghost","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodlord1":{"name":"Blood  Lord1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"snowyeti2":{"name":"Snow Yeti2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"komusume3":{"name":"Komusume","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"akudaikan":{"name":"Akudaikan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ikidaore":{"name":"Ikidaore","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"livingice":{"name":"Living  Ice","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"komusume1":{"name":"Komusume","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"komusume2":{"name":"Komusume","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"inoshishi":{"name":"Inoshishi","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"snowman":{"name":"Snowman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fuyushogun":{"name":"Fuyu  Shogun","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"outfielder":{"name":"Outfielder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"umpire":{"name":"Umpire","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cheerleader":{"name":"Cheerleader","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"infielder":{"name":"Infielder","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"knuckleballer":{"name":"Knuckleballer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"manager":{"name":"Manager","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"slugger":{"name":"Slugger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"imp4":{"name":"Imp4","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sk_archer7":{"name":"Bone Archer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"imp2":{"name":"Imp2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathmauler4":{"name":"Death  Mauler4","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion5":{"name":"Hell Spawn","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"pantherwoman6":{"name":"Saber Cat","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goatman10":{"name":"Death Clan","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"frozenhorror3":{"name":"Frozen  Horror3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"quarterback":{"name":"Quarterback","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cornerback":{"name":"Cornerback","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"linebacker":{"name":"Linebacker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"widereceiver":{"name":"Wide  Receiver","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"defensivetackle":{"name":"Defensive  Tackle","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"defensiveend":{"name":"Defensive  End","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"safety":{"name":"Safety","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ancientbarb1":{"name":"Ancient  Barbarian 1","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ancientbarb2":{"name":"Ancient  Barbarian 2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ancientbarb3":{"name":"Ancient  Barbarian 3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"masterthief":{"name":"Master  Thief","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"namahage":{"name":"Namahage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vileswordsman":{"name":"Vile  Swordsman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"tatarashi":{"name":"Tatarashi","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"shrieker":{"name":"Shrieker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"darkclerk":{"name":"Dark  Clerk","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"nihlathak_clone1":{"name":"Factory  Director","ores":["Uni Ore 0"]},"darkwarehouser":{"name":"Dark  Warehouser","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"factoryscavenger":{"name":"Factory  Scavenger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"darkbouncer":{"name":"Dark  Bouncer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptedbarb1":{"name":"Dark  Employee","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"veteranparttimer":{"name":"Veteran  Part- Timer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"nihlathak_clone2":{"name":"Factory  Director","ores":["Uni Ore 0"]},"factorydust":{"name":"Factory  Dust","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptedbarb2":{"name":"Dark  Employee","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"electricleakage":{"name":"Electric  Leakage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"livingclod":{"name":"Living  Clod","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"nihlathak_clone3":{"name":"Dark  Planter","ores":["Uni Ore 0"]},"darkresearcher":{"name":"Dark  Researcher","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptedbarb3":{"name":"Dark  Farmer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"deathplower":{"name":"Death  Plower","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"corruptedbarb4":{"name":"Scarecrow","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodlord5":{"name":"Blood  Lord5","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cantor6":{"name":"Heirophant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch8":{"name":"Vile Witch","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"reanimatedhorde4":{"name":"Unholy Corpse","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire7":{"name":"Ghoul Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetishshaman8":{"name":"Soul Killer Shaman","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer8":{"name":"Black Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"putriddefiler2":{"name":"Putrid  Defiler2","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider9":{"name":"Invader","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch2":{"name":"Vile Witch","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodlord3":{"name":"Blood  Lord3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"putriddefiler3":{"name":"Putrid  Defiler3","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vilemother5":{"name":"Flesh Spawner","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"reanimatedhorde5":{"name":"Defiled Warrior","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodlord4":{"name":"Blood  Lord4","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"mummy6":{"name":"Cadaver","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"fetish8":{"name":"Soul Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"skmage_pois6":{"name":"Horror Mage","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler8":{"name":"Horadrim  Ancient","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"clawviper10":{"name":"Serpent Magus","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"overlord5":{"name":"Cannibal","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"scarab7":{"name":"Steel Weevil","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"batdemon7":{"name":"Fiend","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp6":{"name":"Black Soul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion11":{"name":"Greater Hell Spawn","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"minion7":{"name":"Greater Hell Spawn","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"kobebeef":{"name":"Kobe  Beef","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"tekkahada":{"name":"Tekkahada","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"abarenboushogun":{"name":"Abarenbou  Shogun","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"matagi":{"name":"Matagi","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"dkmag2":{"name":"Oblivion Knight","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch5":{"name":"Hell  Witch","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"willowisp7":{"name":"Burning Soul","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"succubuswitch3":{"name":"Stygian Fury","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"vampire8":{"name":"Dark Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"megademon5":{"name":"Pit Lord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"unraveler9":{"name":"Horadrim  Ancient","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bonefetish7":{"name":"Undead  Soul Killer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"sandraider10":{"name":"Assailant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"komusume4":{"name":"Komusume","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cr_lancer5":{"name":"Flesh Lancer","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"nihlathak_clone3uber":{"name":"Dark  Planter","ores":["Uni Ore 0"]},"nihlathak_clone2uber":{"name":"Factory  Director","ores":["Uni Ore 0"]},"orochi":{"name":"Orochi","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"orochi_archer":{"name":"Orochi","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"harbingerofpestillence":{"name":"Harbinger Of Pestillence","ores":["Uni Ore 14","Uni Ore 4","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"scorchedhuntress":{"name":"Scorched Huntress","ores":["Uni Ore 14","Uni Ore 4","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"treasuregoblin":{"name":"Treasure Goblin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"needleravager":{"name":"Needle Ravager","ores":["Uni Ore 14","Uni Ore 4","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"bloodpactsatyr":{"name":"Bloodpact Satyr","ores":["Uni Ore 14","Uni Ore 4","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"wingedhorror":{"name":"Winged Horror","ores":["Uni Ore 11","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"phantomassassin":{"name":"Phantom Assassin","ores":["Uni Ore 11","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"crimsonlurker":{"name":"Crimson Lurker","ores":["Uni Ore 11","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"verminhusk":{"name":"Vermin Husk","ores":["Uni Ore 11","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"cremator":{"name":"Cremator","ores":["Uni Ore 7","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"voidwhisper":{"name":"Void Whisper","ores":["Uni Ore 7","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"nosferatuforsakenspawn":{"name":"Nosferatu Forsaken Spawn","ores":["Uni Ore 7","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"soulpiercer":{"name":"Soul Piercer","ores":["Uni Ore 7","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"gravestalker":{"name":"Grave Stalker","ores":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 1","Uni Ore 13"]},"baalmanifestedhatred":{"name":"Baal Manifested Hatred","ores":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 1","Uni Ore 13"]},"bonecrusher":{"name":"Bonecrusher","ores":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 1","Uni Ore 13"]},"ignisfatuus":{"name":"Ignis Fatuus","ores":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 1","Uni Ore 13"]},"dreameater":{"name":"Dream Eater","ores":["Uni Ore 8","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"thunderbeetle":{"name":"Thunder Beetle","ores":["Uni Ore 8","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"heraldofchaos":{"name":"Herald Of Chaos","ores":["Uni Ore 8","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"treasuregoblindouble":{"name":"Treasure Goblin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"bloodboundmarauder":{"name":"Bloodbound Marauder","ores":["Uni Ore 8","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"treasuregoblintriple":{"name":"Treasure Goblin","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"cursedabomination":{"name":"Cursed Abomination","ores":["Uni Ore 5","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"heroimpaler":{"name":"Hero Impaler","ores":["Uni Ore 5","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"steelmaiden":{"name":"Steel Maiden","ores":["Uni Ore 5","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"devourer":{"name":"Devourer","ores":["Uni Ore 5","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"deathshaman":{"name":"Death Shaman","ores":["Uni Ore 6","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"hellhound":{"name":"Hellhound","ores":["Uni Ore 6","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"deathbringer":{"name":"Death Bringer","ores":["Uni Ore 6","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"rottingabomination":{"name":"Rotting Abomination","ores":["Uni Ore 6","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"shroudedhorror":{"name":"Shrouded Horror","ores":["Uni Ore 3","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"spiritweaver":{"name":"Spirit Weaver","ores":["Uni Ore 3","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"hellishcrusader":{"name":"Hellish Crusader","ores":["Uni Ore 3","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"regenerator":{"name":"Regenerator","ores":["Uni Ore 3","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"bonecolossus":{"name":"Bone Colossus","ores":["Uni Ore 9","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"marrowstitchedabomination":{"name":"Marrow Stitched Abomination","ores":["Uni Ore 9","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"soulreaper":{"name":"Soul Reaper","ores":["Uni Ore 9","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"deathshot":{"name":"Deathshot","ores":["Uni Ore 9","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"earthcracker":{"name":"Earth Cracker","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"ancientwarlord":{"name":"Ancient Warlord","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"goblintechies":{"name":"Goblin Techies","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"demonicrevenant":{"name":"Demonic Revenant","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"plagueleaper":{"name":"Plague Leaper","ores":["Uni Ore 2","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"stonewarden":{"name":"Stone Warden","ores":["Uni Ore 2","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"deathstalker":{"name":"Death Stalker","ores":["Uni Ore 2","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"infernalincarnation":{"name":"Infernal Incarnation","ores":["Uni Ore 2","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"shogunofcarnage":{"name":"Shogun Of Carnage","ores":["Uni Ore 0","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"hellfang":{"name":"Hellfang","ores":["Uni Ore 0","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"thunderwhipper":{"name":"Thunder Whipper","ores":["Uni Ore 0","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"cryogenator":{"name":"Cryogenator","ores":["Uni Ore 0","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"medusahellhound":{"name":"Medusa Hellhound","ores":["Uni Ore 10","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"rabidgrizzlybear":{"name":"Rabid Grizzly Bear","ores":["Uni Ore 10","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"revenantofcorruption":{"name":"Revenant Of Corruption","ores":["Uni Ore 10","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"doomspine":{"name":"Doomspine","ores":["Uni Ore 10","Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]},"primordialconstruct":{"name":"Primordial Construct","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"incinerator":{"name":"Incinerator","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"hellboundtrickster":{"name":"Hellbound Trickster","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]},"triuneharbinger":{"name":"Triune Harbinger","ores":["Uni Ore 12","Uni Ore 14","Uni Ore 15","Uni Ore 13"]}},"areaData":[{"name":"Blood Moor","monsters":["quillrat1","cr_lancer1","brute1","zombie1","skeleton1","fallen1","corruptrogue1","zombie2"]},{"name":"Cold Plains","monsters":["quillrat2","cr_archer1","sk_archer1","foulcrow1","cr_lancer1","fallenshaman1","corruptrogue1","cr_lancer2","brute1","bighead3","brute2"]},{"name":"Stony Field","monsters":["quillbear1","cr_archer2","wraith1","corruptrogue2","crownest1","goatman1","cr_archer3","fallen2","skeleton2","skeleton3","goatlord1"]},{"name":"Dark Wood","monsters":["corruptrogue3","fetishblow1","quillrat3","sk_archer2","cr_archer4","fallen3","brute3","cr_lancer3","fallenshaman2","cr_lancer4"]},{"name":"Black Marsh","monsters":["fallenshaman3","skmage_fire1","wraith2","arach1","skmage_ltng1","goatlord2","skmage_pois1","cr_archer4","skmage_cold1","crownest2","goatman2"]},{"name":"Tamoe Highland","monsters":["quillrat4","corruptrogue3","quillbear2","skmage_cold2","skmage_fire2","skmage_ltng2","sk_archer3","fallen4","skmage_pois2","zombie3","cr_lancer4"]},{"name":"Den of Evil","monsters":["foulcrow1","zombie2","fallenshaman1","zombie1","skeleton1","fallen1","corruptrogue1","brute1","bighead3"]},{"name":"Cave Level 1","monsters":["quillbear1","foulcrow2","cr_archer2","wraith1","cr_archer1","corruptrogue1","skeleton2","zombie2","fallenshaman2","skeleton3"]},{"name":"Underground Passage Level 1","monsters":["quillbear1","fallenshaman3","rhino1","cr_archer2","wraith1","bighead4","bonefetish1","corruptrogue2","sk_archer2","skeleton3"]},{"name":"Hole Level 1","monsters":["fallenshaman3","quillrat4","bighead4","arach1","clawviper1","skmage_pois1","cr_archer3","brute3","wraith2"]},{"name":"Blood Ravens Workshop Level 1","monsters":["ravenimp","sk_archer9","ravenshaman","darkcrusher"]},{"name":"Cave Level 2","monsters":["cr_archer2","wraith1","corruptrogue4","corruptrogue2","fallen2","cr_lancer3","skeleton2","zombie2","fallenshaman2","brute2"]},{"name":"Underground Passage Level 2","monsters":["quillrat4","fallenshaman3","skmage_fire1","arach1","bighead4","skmage_ltng1","bonefetish1","skmage_pois1","corruptrogue2","fallen2","brute2"]},{"name":"Hole Level 2","monsters":["fetishblow1","bighead4","fallenshaman4","skeleton4","sk_archer2","mummy1","sk_archer3","fallen3","cr_archer3","brute3","zombie3"]},{"name":"Blood Ravens Workshop Level 2","monsters":["ravenshaman","braven_clone"]},{"name":"Burial Grounds","monsters":["corruptrogue3","cr_archer2","wraith1","corruptrogue2","cr_archer3","cr_lancer2","cr_lancer3","skeleton2","skeleton3"]},{"name":"Crypt","monsters":["corruptrogue3","cr_archer2","wraith1","corruptrogue2","sk_archer2","cr_archer3","cr_lancer3","cr_lancer4","skeleton3"]},{"name":"Mausoleum","monsters":["corruptrogue3","cr_archer2","wraith1","corruptrogue4","corruptrogue2","cr_archer3","cr_lancer3","skeleton2","skeleton3"]},{"name":"Tower Cellar Level 1","monsters":["fallenshaman3","arach1","clawviper1","cr_archer4","goatlord3","bighead1","fallen4","goatman3","wraith2"]},{"name":"Tower Cellar Level 2","monsters":["vampire5","fetish1","fallenshaman4","mummy1","goatlord3","bighead1","fallen4","goatman3","zombie3"]},{"name":"Tower Cellar Level 3","monsters":["sk_archer4","skeleton5","sandleaper2","vulture1","quillbear3","skeleton4","goatlord3","sandleaper1","goatman3"]},{"name":"Tower Cellar Level 4","monsters":["skeleton5","skmage_pois3","skmage_fire3","skmage_cold3","goatlord3","skmage_ltng3","pantherwoman1","vampire1","goatman3"]},{"name":"Tower Cellar Level 5","monsters":["rhino1","swarm1","brute4","brute5","sandleaper3","goatlord3","wraith3","vampire1","goatman3","slinger1"]},{"name":"Monastery Gate","monsters":["corruptrogue3","quillbear2","skmage_cold2","skmage_fire2","bighead4","fallenshaman4","skmage_ltng2","fallen4","skmage_pois2","wraith2"]},{"name":"Outer Cloister","monsters":["skeleton5","corruptrogue3","quillbear2","fallenshaman4","quillbear3","skeleton4","bighead1","fallen4"]},{"name":"Barracks","monsters":["vampire5","sk_archer4","sandleaper2","vulture1","mummy1","flyingscimitar","goatlord5","bighead1","goatman5","zombie3"]},{"name":"Jail Level 1","monsters":["sk_archer4","skeleton5","fallenshaman4","skeleton4","mummy1","goatlord5","sandleaper1","clawviper2","goatman5"]},{"name":"Jail Level 2","monsters":["skeleton5","sandleaper2","vulture1","brute4","quillbear3","sandleaper3","goatlord5","pantherwoman1","goatman5"]},{"name":"Jail Level 3","monsters":["vampire5","skmage_pois3","skmage_fire3","skmage_cold3","goatlord5","skmage_ltng3","goatman5","sandraider1","slinger1"]},{"name":"Inner Cloister","monsters":["sk_archer4","fallenshaman4","quillbear3","sandleaper3","skmage_ltng3","sandraider1","slinger1"]},{"name":"Cathedral","monsters":["swarm1","vulture1","brute4","fallenshaman4","brute5","sandleaper3","pantherwoman1","wraith3","slinger1","corruptrogue4"]},{"name":"Catacombs Level 1","monsters":["claygolemmon","arach2","batdemon1","swarm1","brute4","blackknight1","vampire1","bighead2"]},{"name":"Catacombs Level 2","monsters":["claygolemmon","vulture1","skmage_pois3","skmage_fire3","skmage_cold3","blackknight1","skmage_ltng3","clawviper2","wraith3","corruptrogue4"]},{"name":"Catacombs Level 3","monsters":["claygolemmon","skeleton5","foulcrow3","brute4","brute5","sandleaper3","blackknight1","clawviper2","vampire1","corruptrogue4"]},{"name":"Catacombs Level 4","monsters":["claygolemmon","overlord1","batdemon1","brute5","goatlord5","blackknight1","goatman5","vampire1","bighead2"]},{"name":"Tristram","monsters":["fallenshaman3","cr_archer4","sk_archer3","blackknight1","brute3","fallenshaman2","cr_lancer4"]},{"name":"Moo Moo Farm","monsters":["hellbovine","hellbovine3","milkmaiden","hellbovine2","blackknight5"]},{"name":"Rocky Waste","monsters":["sandmaggot1","batdemon2","pantherwoman2","clawviper3","wraith4","slinger2","mummy3","vulture2"]},{"name":"Dry Hills","monsters":["sandmaggot1","slinger5","blunderbore2","clawviper3","sandraider3","swarm2","arach3","mummy3","vulture2"]},{"name":"Far Oasis","monsters":["slinger3","crownest4","sandmaggot3","swarm2","sandmaggot2","mosquito1","pantherwoman3"]},{"name":"Lost Farm","monsters":["hellcowboy1","hellcowboy2","cowfly","hellcowboy3"]},{"name":"Valley of Snakes","monsters":["slinger3","foulcrow4","thornhulk2","mummy4","swarm3","clawviper5","unraveler4","clawviper4","vulture4"]},{"name":"Canyon of the Magi","monsters":["pantherwoman4","mummy4","clawviper5","unraveler4","slinger6","vulture4","zombie5"]},{"name":"Temple Passage Level 1","monsters":["unraveler3","sandraider3","unraveler1","mummy3","unraveler2","vulture2"]},{"name":"Sewers Level 1","monsters":["batdemon2","pantherwoman2","clawviper3","wraith4","sandmaggot2","slinger2"]},{"name":"Sewers Level 2","monsters":["sandmaggot3","arach3","sandmaggot2","willowisp1","swarm3","mosquito1"]},{"name":"Underground Maze","monsters":["batdemon2","clawviper3","scarab4","mummy4","slinger2","baboon1","slinger4"]},{"name":"Palace Cellar Level 1","monsters":["sandmaggot1","slinger5","blunderbore2","unraveler3","sandraider3","swarm3","baboon1"]},{"name":"Palace Cellar Level 2","monsters":["slinger3","pantherwoman4","thornhulk1","sandraider3","wraith5","baboon1","sk_archer5"]},{"name":"Palace Cellar Level 3","monsters":["skmage_ltng4","skmage_fire4","skmage_pois4","sandraider3","skmage_cold4","baboon1","sk_archer5","blunderbore1"]},{"name":"Dark Magician's Chamber Level 1","monsters":["chaosmage3","chaosmage2","chaosmage1","chaossummoner"]},{"name":"Halls of the Dead Level 1","monsters":["slinger3","sandmaggot2","willowisp1","swarm3","mosquito1","baboon1","mummy3"]},{"name":"Temple Passage Level 2","monsters":["rhino2","unraveler3","wraith4","bonefetish2","sandraider2","mummy3","unraveler2"]},{"name":"Claw Viper Temple Level 1","monsters":["mummy4","bloodgolemmon","swarm3","clawviper4","clawviper5","pantherwoman3"]},{"name":"Dark Magician's Chamber Level 2","monsters":["chaosmage1","summoner_clone2","chaosmage3","summoner_clone1","chaosmage2"]},{"name":"Halls of the Dead Level 2","monsters":["thornhulk1","scarab4","mummy4","clawviper5","unraveler4","zombie5"]},{"name":"Claw Viper Temple Level 2","monsters":["slinger3","fetish2","bonefetish2","sandmaggot4","baboon1","fetishblow2"]},{"name":"Maggot Tunnels","monsters":["sandmaggot3","arach3","scarab3","willowisp1","swarm3","mosquito1"]},{"name":"Maggot Passage","monsters":["slinger5","clawviper3","arach3","scarab4","willowisp1","swarm3","sandmaggot4"]},{"name":"Maggot Lair","monsters":["rhino2","sandmaggot3","arach3","wraith4","swarm3","sandmaggot4","mummy3"]},{"name":"Andariel's Dressing Room","monsters":["andariel_clone","chaosmage1","clawviper9","vilemother4","hairdresser","chaosmage2"]},{"name":"Tal Rasha's Tomb","monsters":["goatman4","thornhulk2","sandraider3","zombie5","bloodgolemmon","overlord2","blackknight2","zombie4"]},{"name":"Tal Rasha's Tomb","monsters":["pantherwoman4","sandmaggot5","sandraider3","mummy4","bloodgolemmon","overlord2","blackknight2","goatman4"]},{"name":"Tal Rasha's Tomb","monsters":["thornhulk2","bloodgolemmon","overlord2","blackknight2","clawviper4","slinger6","vulture4","goatman4"]},{"name":"Tal Rasha's Tomb","monsters":["goatman4","bloodgolemmon","overlord2","blackknight2","clawviper4","slinger6","vulture4","sandleaper4"]},{"name":"Tal Rasha's Tomb","monsters":["pantherwoman4","sandmaggot5","thornhulk2","sandraider3","bloodgolemmon","overlord2","blackknight2","goatman4"]},{"name":"Tal Rasha's Tomb","monsters":["goatman4","sandraider4","zombie5","mummy4","bloodgolemmon","overlord2","blackknight2","zombie4"]},{"name":"Tal Rasha's Tomb","monsters":["goatman4","sandraider4","thornhulk2","zombie5","bloodgolemmon","overlord2","blackknight2","zombie4"]},{"name":"Duriel's Lair","monsters":["sandraider4","zombie5","mummy4","goatman2","bloodgolemmon","overlord2","blackknight2","zombie4"]},{"name":"Arcane Sanctuary","monsters":["overlord2","bloodgolemmon","clawviper5","blackknight2","unraveler4","slinger6","goatman4"]},{"name":"Spider Forest","monsters":["thornhulk2","mosquito2","zealot2","arach4","swarm4","vulture4"]},{"name":"Marsh of Pain","monsters":["dozaemon","deathstinger","soullessarcher","duriel_clone","blacksoul","livingmaul"]},{"name":"Flayer Jungle","monsters":["bonefetish3","fetish3","bonefetish5","fetishshaman3","fetishshaman5","fetishshaman4"]},{"name":"Lower Kurast","monsters":["batdemon3","frogdemon1","blunderbore3","mummy5","frogdemon3","thornhulk3"]},{"name":"Kurast Bazaar","monsters":["baboon5","fetish5","baboon4","arach5","fetishblow4","mosquito4"]},{"name":"Upper Kurast","monsters":["fetish4","bonefetish4","vulture3","willowisp3","thornhulk4","corruptrogue5","vampire2"]},{"name":"Kurast Causeway","monsters":["cantor3","irongolemmon","zealot1","cantor2","vampire4","batdemon4"]},{"name":"Travincal","monsters":["zealot3","baboon6","irongolemmon","vampire3","cantor4","batdemon4"]},{"name":"Harpie's Nest Level 2","monsters":["sorrowsummoner","darkharpie","hephasto_clone"]},{"name":"Spider Cavern","monsters":["willowisp2","scarab5","sandmaggot5","arach3","arach4","sandleaper4"]},{"name":"Bookstore Sarina Level 1","monsters":["mindsucker","acupuncturist","maneater","blacksoul","twisted","tramplespider"]},{"name":"Harpie's Nest Level 1","monsters":["succubus7","succubuswitch6","sorrowsummoner","succubus6","maneater","twisted","succubuswitch7"]},{"name":"Flayer Tunnel","monsters":["fetish3","fetish5","bonefetish5","fetishshaman3","fetishshaman5","fetishshaman4"]},{"name":"Flayer Dungeon Level 1","monsters":["bonefetish3","fetishblow4","bonefetish5","fetishshaman3","fetishshaman5","fetish3"]},{"name":"Swampy Pit","monsters":["willowisp2","baboon3","baboon4","arach5","mosquito2","swarm4"]},{"name":"Flayer Dungeon Level 2","monsters":["fetish3","fetish5","bonefetish5","fetishshaman3","fetishshaman5","fetishshaman4"]},{"name":"Sewers Level 1","monsters":["zombie4","willowisp2","baboon3","arach4","frogdemon2","sandraider4"]},{"name":"Sewers Level 2","monsters":["batdemon3","blunderbore3","vulture3","willowisp3","batdemon4","vampire2"]},{"name":"Bookstore Sarina Level 2","monsters":["sarinasmaiden","deathstinger","mindsucker","acupuncturist","hairdresser","livingmaul"]},{"name":"Disused Fane","monsters":["frogdemon1","blunderbore3","bonefetish4","fetish5","arach5","fetishblow4"]},{"name":"Forgotten Reliquary","monsters":["cantor3","frogdemon1","irongolemmon","zealot1","mummy5","mosquito4"]},{"name":"Forgotten Temple","monsters":["irongolemmon","vulture3","frogdemon3","vampire4","thornhulk4","vampire2"]},{"name":"Ruined Fane","monsters":["cantor3","frogdemon1","irongolemmon","zealot1","mummy5","mosquito4"]},{"name":"Disused Reliquary","monsters":["blunderbore3","irongolemmon","willowisp3","cantor2","batdemon4","thornhulk3"]},{"name":"Durance of Hate Level 1","monsters":["cantor3","blackknight3","irongolemmon","willowisp3","batdemon4","vampire2","goatman6"]},{"name":"Durance of Hate Level 2","monsters":["overlord3","blackknight3","irongolemmon","vampire4","batdemon4","thornhulk4","corruptrogue5","goatman6"]},{"name":"Durance of Hate Level 3","monsters":["overlord3","blackknight3","irongolemmon","vampire3","vampire4","corruptrogue5"]},{"name":"Outer Steppes","monsters":["fingermage1","vilemother1","regurgitator2","blackknight4","sandleaper5","rhino4","firegolemmon","doomknight1","megademon3","regurgitator1","quillbear5"]},{"name":"Plains of Despair","monsters":["fingermage1","vilemother1","willowisp4","megademon3","blackknight4","rhino4","firegolemmon","fallen5","doomknight1","sandraider5","fallenshaman5"]},{"name":"City of the Damned","monsters":["willowisp4","fingermage2","regurgitator3","blackknight4","doomknight2","megademon1","firegolemmon","bighead5","megademon2","vilemother2"]},{"name":"River of Flame","monsters":["overlord4","fingermage2","regurgitator3","blackknight4","doomknight2","firegolemmon","goatlord6","batdemon5","vilemother3","megademon2","belhifet1"]},{"name":"The Chaos Sanctuary","monsters":["overlord4","blunderbore4","doomknight3","blackknight4","firegolemmon","beholder","goatlord6","fingermage3","megademon3"]},{"name":"Bloody Foothills","monsters":["sk_archer6","foulcrow5","imp1","bighead6","overseer1","vulture5","thornhulk5","minion1","deathmauler1","slinger7","quillrat6"]},{"name":"Frigid Highlands","monsters":["sk_archer6","imp1","deathmauler2","blunderbore2","overseer2","cr_lancer6","siegebeast2","minion2","cyclops1","sk_archer3","imp3","blunderbore5","siegebeast1","slinger4","slinger8","cr_archer6"]},{"name":"Arreat Plateau","monsters":["slinger5","siegebeast3","overseer2","minion4","skmage_fire5","fallenshaman6","skmage_fire3","goatman7","cyclops1","minion2","skmage_ltng3","imp3","overseer5","skmage_ltng5","slinger9","minion3","overseer3","deathmauler3"]},{"name":"Nowhere","monsters":["treant","automaton","blacksoul","pestilencerat","grimalkin","ghastlyhorseman"]},{"name":"Frozen River","monsters":["clawviper6","succubuswitch6","reanimatedhorde1","skmage_cold5","succubus5","willowisp5","frozenhorror1","snowyeti1","succubus6","cr_lancer7","frozenhorror2","wraith6","bloodlord1","deathmauler3","snowyeti2"]},{"name":"Naraku Level 1","monsters":["komusume3","akudaikan","acupuncturist","ikidaore","livingice","komusume1","komusume2","inoshishi","snowman","fuyushogun"]},{"name":"Bill Roper Memorial Ball Park","monsters":["outfielder","umpire","cheerleader","infielder","knuckleballer","manager","slugger"]},{"name":"Frozen Tundra","monsters":["imp4","sk_archer7","imp2","succubus5","deathmauler4","siegebeast2","minion5","vulture5","pantherwoman6","skmage_ltng5","goatman10"]},{"name":"The Ancients' Way","monsters":["bloodlord1","frozenhorror3","deathmauler3"]},{"name":"GFraizer Dome","monsters":["quarterback","cornerback","linebacker","widereceiver","defensivetackle","cheerleader","defensiveend","safety"]},{"name":"Arreat Summit","monsters":["ancientbarb1","ancientbarb2","ancientbarb3"]},{"name":"The Dead End","monsters":["masterthief"]},{"name":"Nihlathak's Domain Level 1","monsters":["namahage","automaton","vileswordsman","tatarashi","shrieker","beholder","pestilencerat","grimalkin"]},{"name":"Nihlathak's Domain Level 2","monsters":["automaton","vileswordsman","tatarashi","shrieker","beholder","pestilencerat","grimalkin"]},{"name":"Moonshine Distillery","monsters":["darkclerk","nihlathak_clone1","darkwarehouser","factoryscavenger","darkbouncer","corruptedbarb1","veteranparttimer"]},{"name":"Fake Note Factory","monsters":["nihlathak_clone2","factorydust","darkwarehouser","factoryscavenger","corruptedbarb2","electricleakage","veteranparttimer"]},{"name":"Poppy Farm","monsters":["darkclerk","livingclod","nihlathak_clone3","darkresearcher","corruptedbarb3","deathplower","corruptedbarb4"]},{"name":"The Worldstone Keep Level 1","monsters":["bloodlord5","cantor6","succubuswitch8","reanimatedhorde4","vampire7","fetishshaman8","blackknight5","cr_lancer8","putriddefiler2","sandraider9","succubuswitch2","bloodlord3","putriddefiler3","vilemother5","reanimatedhorde5"]},{"name":"The Worldstone Keep Level 2","monsters":["bloodlord4","mummy6","fetish8","skmage_pois6","unraveler8","clawviper10","overlord5","blackknight5","scarab7","batdemon7","willowisp6","minion11","minion7"]},{"name":"Naraku Level 3","monsters":["namahage","kobebeef","tekkahada","abarenboushogun","ikidaore","livingice","matagi","fuyushogun"]},{"name":"Throne of Destruction","monsters":["bloodlord5","dkmag2","succubuswitch5","willowisp7","clawviper10","succubuswitch3","blackknight5","vampire8","megademon5","unraveler9","bonefetish7","sandraider10"]},{"name":"Matron's Den","monsters":["komusume4","tekkahada","namahage","cr_lancer5"]},{"name":"Forgotten Sands","monsters":["ghastlyhorseman","masterthief"]},{"name":"Furnace of Pain","monsters":["nihlathak_clone3uber","pestilencerat","nihlathak_clone2uber"]},{"name":"Naraku Level 2","monsters":["orochi","tekkahada","akudaikan","komusume4","abarenboushogun","livingice","komusume2","orochi_archer","beholder","namahage"]},{"name":"Nosliwyaj's Reign","monsters":["outfielder","umpire","cheerleader","infielder","knuckleballer","manager","slugger"]},{"name":"Chasm of Horror Level 1","monsters":["harbingerofpestillence","scorchedhuntress","treasuregoblin","needleravager","bloodpactsatyr"]},{"name":"Chasm of Horror Level 2","monsters":["harbingerofpestillence","scorchedhuntress","treasuregoblin","needleravager","bloodpactsatyr"]},{"name":"Crypt of Damnation","monsters":["treasuregoblin","wingedhorror","phantomassassin","crimsonlurker","verminhusk"]},{"name":"Necropolis Level 1","monsters":["treasuregoblin","cremator","voidwhisper","nosferatuforsakenspawn","soulpiercer"]},{"name":"Necropolis Level 2","monsters":["treasuregoblin","cremator","voidwhisper","nosferatuforsakenspawn","soulpiercer"]},{"name":"Cellar of Pain Level 1","monsters":["gravestalker","baalmanifestedhatred","bonecrusher","treasuregoblin","ignisfatuus"]},{"name":"Cellar of Pain Level 2","monsters":["gravestalker","baalmanifestedhatred","bonecrusher","treasuregoblin","ignisfatuus"]},{"name":"Ancient Tomb","monsters":["dreameater","thunderbeetle","heraldofchaos","treasuregoblindouble","bloodboundmarauder"]},{"name":"Infested Lair Level 1","monsters":["treasuregoblintriple","cursedabomination","heroimpaler","steelmaiden","devourer"]},{"name":"Infested Lair Level 2","monsters":["treasuregoblintriple","cursedabomination","heroimpaler","steelmaiden","devourer"]},{"name":"Chaos Rift Level 1","monsters":["deathshaman","treasuregoblin","hellhound","deathbringer","rottingabomination"]},{"name":"Chaos Rift Level 2","monsters":["deathshaman","treasuregoblin","hellhound","deathbringer","rottingabomination"]},{"name":"Chaos Rift Level 3","monsters":["deathshaman","treasuregoblin","hellhound","deathbringer","rottingabomination"]},{"name":"Chaos Rift Level 4","monsters":["deathshaman","treasuregoblin","hellhound","deathbringer","rottingabomination"]},{"name":"Labyrinth of Suffering Level 1","monsters":["shroudedhorror","spiritweaver","treasuregoblin","hellishcrusader","regenerator"]},{"name":"Labyrinth of Suffering Level 2","monsters":["shroudedhorror","spiritweaver","treasuregoblin","hellishcrusader","regenerator"]},{"name":"Twisted Maze","monsters":["treasuregoblintriple","bonecolossus","marrowstitchedabomination","soulreaper","deathshot"]},{"name":"Endless Abyss Level 1","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 2","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 3","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 4","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 5","monsters":["earthcracker","ancientwarlord","goblintechies","demonicrevenant","treasuregoblindouble"]},{"name":"Endless Abyss Level 6","monsters":["treasuregoblintriple","earthcracker","ancientwarlord","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 7","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 8","monsters":["earthcracker","ancientwarlord","treasuregoblin","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 9","monsters":["treasuregoblintriple","earthcracker","ancientwarlord","goblintechies","demonicrevenant"]},{"name":"Endless Abyss Level 10","monsters":["treasuregoblintriple","earthcracker","ancientwarlord","goblintechies","demonicrevenant"]},{"name":"Decaying Depths","monsters":["plagueleaper","stonewarden","treasuregoblindouble","deathstalker","infernalincarnation"]},{"name":"Frozen Wastes","monsters":["shogunofcarnage","treasuregoblin","hellfang","thunderwhipper","cryogenator"]},{"name":"Frozen Wastes Northern Descent","monsters":["shogunofcarnage","treasuregoblin","hellfang","thunderwhipper","cryogenator"]},{"name":"Frozen Wastes Southern Descent","monsters":["shogunofcarnage","treasuregoblin","hellfang","thunderwhipper","cryogenator"]},{"name":"Shrine of Destruction Level 1","monsters":["treasuregoblintriple"]},{"name":"Shrine of Destruction Level 2","monsters":["treasuregoblintriple"]},{"name":"Reliquary of Souls Level 1","monsters":["treasuregoblintriple"]},{"name":"Reliquary of Souls Level 2","monsters":["treasuregoblintriple"]},{"name":"Reliquary of Souls Level 3","monsters":["treasuregoblintriple"]},{"name":"Reliquary of Souls Level 4","monsters":["treasuregoblintriple"]},{"name":"Cursed Ossuary","monsters":["treasuregoblintriple","medusahellhound","rabidgrizzlybear","revenantofcorruption","doomspine"]},{"name":"Eye of the Storm","monsters":["shroudedhorror","soulreaper","bonecolossus","spiritweaver","treasuregoblintriple","marrowstitchedabomination","cremator","voidwhisper","soulpiercer","nosferatuforsakenspawn","hellishcrusader","regenerator","deathshot"]},{"name":"The Iron Keep Level 1","monsters":["shroudedhorror","soulreaper","bonecolossus","spiritweaver","treasuregoblintriple","marrowstitchedabomination","cremator","voidwhisper","soulpiercer","nosferatuforsakenspawn","hellishcrusader","regenerator","deathshot"]},{"name":"The Spiral of Souls Level 1","monsters":["shroudedhorror","soulreaper","bonecolossus","spiritweaver","treasuregoblintriple","marrowstitchedabomination","cremator","voidwhisper","soulpiercer","nosferatuforsakenspawn","hellishcrusader","regenerator","deathshot"]},{"name":"The Rift of Perdition Level 1","monsters":["shroudedhorror","soulreaper","bonecolossus","spiritweaver","treasuregoblintriple","marrowstitchedabomination","cremator","voidwhisper","soulpiercer","nosferatuforsakenspawn","hellishcrusader","regenerator","deathshot"]},{"name":"The Icecrown Citadel","monsters":["primordialconstruct","treasuregoblintriple","harbingerofpestillence","earthcracker","scorchedhuntress","deathshaman","ancientwarlord","incinerator","goblintechies","hellboundtrickster","demonicrevenant","triuneharbinger","needleravager","hellhound","bloodpactsatyr","deathbringer","rottingabomination"]},{"name":"The Sanctum of the Dead","monsters":["treasuregoblintriple","cursedabomination","heroimpaler","shogunofcarnage","wingedhorror","steelmaiden","devourer","phantomassassin","hellfang","thunderwhipper","crimsonlurker","cryogenator","verminhusk"]},{"name":"The Reliquary of False Light Level 1","monsters":["treasuregoblintriple","medusahellhound","gravestalker","baalmanifestedhatred","bonecrusher","rabidgrizzlybear","plagueleaper","stonewarden","dreameater","thunderbeetle","heraldofchaos","revenantofcorruption","doomspine","deathstalker","infernalincarnation","ignisfatuus","bloodboundmarauder"]},{"name":"The Reliquary of False Light Level 2","monsters":["treasuregoblintriple","medusahellhound","gravestalker","baalmanifestedhatred","bonecrusher","rabidgrizzlybear","plagueleaper","stonewarden","dreameater","thunderbeetle","heraldofchaos","revenantofcorruption","doomspine","deathstalker","infernalincarnation","ignisfatuus","bloodboundmarauder"]},{"name":"The Reliquary of False Light Level 3","monsters":["treasuregoblintriple","medusahellhound","gravestalker","baalmanifestedhatred","bonecrusher","rabidgrizzlybear","plagueleaper","stonewarden","dreameater","thunderbeetle","heraldofchaos","revenantofcorruption","doomspine","deathstalker","infernalincarnation","ignisfatuus","bloodboundmarauder"]},{"name":"Infernal Nexus","monsters":["primordialconstruct","treasuregoblintriple","incinerator","hellboundtrickster","triuneharbinger"]}],"areaOreMap":{"Blood Moor":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Cold Plains":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Stony Field":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Dark Wood":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Black Marsh":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tamoe Highland":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Den of Evil":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Cave Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Underground Passage Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Hole Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Blood Ravens Workshop Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Cave Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Underground Passage Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Hole Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Blood Ravens Workshop Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 11","Uni Ore 13"],"Burial Grounds":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Crypt":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Mausoleum":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tower Cellar Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tower Cellar Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tower Cellar Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tower Cellar Level 4":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tower Cellar Level 5":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Monastery Gate":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Outer Cloister":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Barracks":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Jail Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Jail Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Jail Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Inner Cloister":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Cathedral":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Catacombs Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Catacombs Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Catacombs Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Catacombs Level 4":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Tristram":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Moo Moo Farm":["Uni Ore 10","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Rocky Waste":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Dry Hills":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Far Oasis":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Lost Farm":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Valley of Snakes":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Canyon of the Magi":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Temple Passage Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Sewers Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Sewers Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Underground Maze":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Palace Cellar Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Palace Cellar Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Palace Cellar Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Dark Magician's Chamber Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Halls of the Dead Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Temple Passage Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Claw Viper Temple Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Dark Magician's Chamber Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 7"],"Halls of the Dead Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Claw Viper Temple Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Maggot Tunnels":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Maggot Passage":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Maggot Lair":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Andariel's Dressing Room":["Uni Ore 5","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Tal Rasha's Tomb":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Duriel's Lair":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Arcane Sanctuary":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Spider Forest":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Marsh of Pain":["Uni Ore 4","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Flayer Jungle":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Lower Kurast":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Kurast Bazaar":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Upper Kurast":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Kurast Causeway":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Travincal":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Harpie's Nest Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"Spider Cavern":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Bookstore Sarina Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Harpie's Nest Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Flayer Tunnel":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Flayer Dungeon Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Swampy Pit":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Flayer Dungeon Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Bookstore Sarina Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Disused Fane":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Forgotten Reliquary":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Forgotten Temple":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Ruined Fane":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Disused Reliquary":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Durance of Hate Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Durance of Hate Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Durance of Hate Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Outer Steppes":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Plains of Despair":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"City of the Damned":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"River of Flame":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"The Chaos Sanctuary":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Bloody Foothills":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Frigid Highlands":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Arreat Plateau":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Nowhere":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Frozen River":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Naraku Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Bill Roper Memorial Ball Park":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Frozen Tundra":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"The Ancients' Way":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"GFraizer Dome":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Arreat Summit":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"The Dead End":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Nihlathak's Domain Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Nihlathak's Domain Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Moonshine Distillery":["Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Fake Note Factory":["Uni Ore 0","Uni Ore 15","Uni Ore 12","Uni Ore 14","Uni Ore 13"],"Poppy Farm":["Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"The Worldstone Keep Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"The Worldstone Keep Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Naraku Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Throne of Destruction":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Matron's Den":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Forgotten Sands":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Furnace of Pain":["Uni Ore 0","Uni Ore 15","Uni Ore 12","Uni Ore 14","Uni Ore 13"],"Naraku Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Nosliwyaj's Reign":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Chasm of Horror Level 1":["Uni Ore 4","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Chasm of Horror Level 2":["Uni Ore 4","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Crypt of Damnation":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 11","Uni Ore 13"],"Necropolis Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 7"],"Necropolis Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 7"],"Cellar of Pain Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 1","Uni Ore 12","Uni Ore 13"],"Cellar of Pain Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 1","Uni Ore 12","Uni Ore 13"],"Ancient Tomb":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 8"],"Infested Lair Level 1":["Uni Ore 5","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Infested Lair Level 2":["Uni Ore 5","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Chaos Rift Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"Chaos Rift Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"Chaos Rift Level 3":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"Chaos Rift Level 4":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"Labyrinth of Suffering Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 3"],"Labyrinth of Suffering Level 2":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 3"],"Twisted Maze":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 9"],"Endless Abyss Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 4":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 5":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 6":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 7":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 8":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 9":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Endless Abyss Level 10":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Decaying Depths":["Uni Ore 2","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Frozen Wastes":["Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Frozen Wastes Northern Descent":["Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Frozen Wastes Southern Descent":["Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Shrine of Destruction Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Shrine of Destruction Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Reliquary of Souls Level 1":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Reliquary of Souls Level 2":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Reliquary of Souls Level 3":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Reliquary of Souls Level 4":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"],"Cursed Ossuary":["Uni Ore 10","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13"],"Eye of the Storm":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 9","Uni Ore 7","Uni Ore 3"],"The Iron Keep Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 9","Uni Ore 7","Uni Ore 3"],"The Spiral of Souls Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 9","Uni Ore 7","Uni Ore 3"],"The Rift of Perdition Level 1":["Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 9","Uni Ore 7","Uni Ore 3"],"The Icecrown Citadel":["Uni Ore 4","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 13","Uni Ore 6"],"The Sanctum of the Dead":["Uni Ore 5","Uni Ore 0","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 11","Uni Ore 13"],"The Reliquary of False Light Level 1":["Uni Ore 2","Uni Ore 10","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 1","Uni Ore 13","Uni Ore 8"],"The Reliquary of False Light Level 2":["Uni Ore 2","Uni Ore 10","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 1","Uni Ore 13","Uni Ore 8"],"The Reliquary of False Light Level 3":["Uni Ore 2","Uni Ore 10","Uni Ore 15","Uni Ore 14","Uni Ore 12","Uni Ore 1","Uni Ore 13","Uni Ore 8"],"Infernal Nexus":["Uni Ore 14","Uni Ore 15","Uni Ore 12","Uni Ore 13"]}};
+
+// ============================================================
+// STATE & CONSTANTS
+// ============================================================
+const CRYSTAL_COLORS = {
+  'xtal-00': '#9a8fef',
+  'xtal-01': '#8f8f8f',
+  'xtal-02': '#ea8186',
+  'xtal-03': '#ffffc0',
+  'xtal-04': '#9991f4',
+  'xtal-05': '#2d8838',
+  'xtal-06': '#e5ddb6',
+  'xtal-07': '#f17688',
+  'xtal-08': '#60c067',
+  'xtal-09': '#e0e0e0',
+  'xtal-10': '#efc066',
+  'xtal-11': '#b90efb'
+};
+
+const state = {
+  crystalFilter: new Set(),
+  view: 'monster',
+  search: '',
+};
+
+// Derived lookups built from EMBEDDED data
+let oreMap = {};      // ore name -> ore object {name, crystals}
+let monsterMap = {};  // monster id -> {name, ores[]}
+let areaList = [];      // [{name, monsters[], ores[]}]
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  // Build lookups
+  EMBEDDED.oreData.forEach(ore => oreMap[ore.name] = ore);
+
+  Object.entries(EMBEDDED.monsterData).forEach(([id, mon]) => {
+    monsterMap[id] = { id, name: mon.name, ores: mon.ores };
+  });
+
+  areaList = EMBEDDED.areaData.map(area => {
+    const oreSet = new Set();
+    area.monsters.forEach(mid => {
+      (monsterMap[mid]?.ores || []).forEach(o => oreSet.add(o));
+    });
+    return { name: area.name, monsters: area.monsters, ores: [...oreSet] };
+  });
+
+  buildLegend();
+  render();
+}
+
+// ============================================================
+// CRYSTAL HELPERS
+// ============================================================
+function crystalName(id) {
+  return EMBEDDED.crystalInfo[id]?.name || id;
+}
+
+function crystalColor(id) {
+  return CRYSTAL_COLORS[id] || EMBEDDED.crystalInfo[id]?.color || '#888';
+}
+
+function crystalTagHTML(crystal) {
+  const color = crystalColor(crystal.stat);
+  const isPrimary = crystal.min > 1;
+  const qty = isPrimary ? `${crystal.min}–${crystal.max}` : `0–${crystal.max}`;
+  const cls = isPrimary ? 'primary' : 'secondary';
+  return `<span class="crystal-tag ${cls}" style="background:${color}18;border-color:${color}50;color:${color}">
+    <span class="crystal-dot" style="background:${color}"></span>
+    ${crystalName(crystal.stat)}
+    <span class="qty">${qty}</span>
+  </span>`;
+}
+
+// ============================================================
+// LEGEND
+// ============================================================
+function buildLegend() {
+  const legend = document.getElementById('crystal-legend');
+  legend.innerHTML = '';
+
+  // Count monsters per crystal
+  const crystalMonCount = {};
+  Object.values(monsterMap).forEach(mon => {
+    const seen = new Set();
+    mon.ores.forEach(oreName => {
+      const ore = oreMap[oreName];
+      if (!ore) return;
+      ore.crystals.forEach(c => {
+        if (!seen.has(c.stat)) {
+          seen.add(c.stat);
+          crystalMonCount[c.stat] = (crystalMonCount[c.stat] || 0) + 1;
+        }
+      });
+    });
+  });
+
+  Object.entries(EMBEDDED.crystalInfo).sort((a,b) => a[0].localeCompare(b[0])).forEach(([id, info]) => {
+    const color = crystalColor(id);
+    const active = state.crystalFilter.size === 0 || state.crystalFilter.has(id);
+    const item = document.createElement('div');
+    item.className = 'crystal-legend-item';
+    item.style.opacity = active ? '1' : '0.35';
+    item.innerHTML = `
+      <div class="crystal-dot" style="background:${color};box-shadow:0 0 6px ${color}40"></div>
+      <span class="crystal-name">${info.name}</span>
+      <span class="crystal-count">${crystalMonCount[id] || 0}</span>
+    `;
+    item.onclick = () => toggleCrystalFilter(id);
+    legend.appendChild(item);
+  });
+}
+
+function toggleCrystalFilter(id) {
+  if (state.crystalFilter.has(id)) state.crystalFilter.delete(id);
+  else state.crystalFilter.add(id);
+  buildLegend();
+  render();
+}
+
+function resetCrystalFilter() {
+  state.crystalFilter.clear();
+  buildLegend();
+  render();
+}
+
+// ============================================================
+// VIEW & SEARCH
+// ============================================================
+function setView(v) {
+  state.view = v;
+  document.querySelectorAll('.filter-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['monster','crystal','ore','area'][i] === v);
+  });
+  render();
+}
+
+function applyFilters() {
+  state.search = document.getElementById('search').value.toLowerCase().trim();
+  render();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const content = document.getElementById('content');
+  if (state.view === 'monster') renderMonsterView(content);
+  else if (state.view === 'crystal') renderCrystalView(content);
+  else if (state.view === 'ore') renderOreView(content);
+  else renderAreaView(content);
+}
+
+// ============================================================
+// RELEVANCE SCORING
+// Returns a score: number of filtered-crystal hits across all ores.
+// Higher = more relevant. Used to sort results when filter is active.
+// ============================================================
+function monsterRelevanceScore(mon) {
+  if (state.crystalFilter.size === 0) return 0;
+  let score = 0;
+  mon.ores.forEach(oreName => {
+    const ore = oreMap[oreName];
+    if (!ore) return;
+    ore.crystals.forEach(c => {
+      if (state.crystalFilter.has(c.stat)) {
+        // Primary drops (min > 1) worth more than bonus drops
+        score += c.min > 1 ? 3 : 1;
+      }
+    });
+  });
+  return score;
+}
+
+function oreRelevanceScore(ore) {
+  if (state.crystalFilter.size === 0) return 0;
+  let score = 0;
+  ore.crystals.forEach(c => {
+    if (state.crystalFilter.has(c.stat)) score += c.min > 1 ? 3 : 1;
+  });
+  return score;
+}
+
+function areaRelevanceScore(area) {
+  if (state.crystalFilter.size === 0) return 0;
+  let score = 0;
+  area.ores.forEach(oreName => {
+    const ore = oreMap[oreName];
+    if (!ore) return;
+    ore.crystals.forEach(c => {
+      if (state.crystalFilter.has(c.stat)) score += c.min > 1 ? 3 : 1;
+    });
+  });
+  return score;
+}
+
+// Helper: does a monster pass crystal filter?
+function monsterPassesCrystalFilter(mon) {
+  if (state.crystalFilter.size === 0) return true;
+  for (const oreName of mon.ores) {
+    const ore = oreMap[oreName];
+    if (!ore) continue;
+    for (const c of ore.crystals) {
+      if (state.crystalFilter.has(c.stat)) return true;
+    }
+  }
+  return false;
+}
+
+// ============================================================
+// MONSTER VIEW
+// ============================================================
+function renderMonsterView(content) {
+  const search = state.search;
+
+  const filtered = Object.values(monsterMap).filter(mon => {
+    if (search && !mon.name.toLowerCase().includes(search) && !mon.id.includes(search)) return false;
+    return monsterPassesCrystalFilter(mon);
+  }).sort((a, b) => {
+    if (state.crystalFilter.size > 0) {
+      const diff = monsterRelevanceScore(b) - monsterRelevanceScore(a);
+      if (diff !== 0) return diff;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  if (filtered.length === 0) {
+    content.innerHTML = `<div class="empty-state">No monsters match your filters.</div>`;
+    return;
+  }
+
+  let html = `<div class="results-header">
+    <h2>Monster Drop Sources</h2>
+    <span class="results-count">${filtered.length} monster${filtered.length !== 1 ? 's' : ''}</span>
+  </div><div class="monster-grid">`;
+
+  filtered.forEach(mon => {
+    const allCrystalIds = [...new Set(mon.ores.flatMap(oreName => (oreMap[oreName]?.crystals || []).map(c => c.stat)))];
+    const pips = allCrystalIds.slice(0,8).map(cid => {
+      const color = crystalColor(cid);
+      return `<span class="crystal-pip" style="background:${color};box-shadow:0 0 4px ${color}60"></span>`;
+    }).join('');
+
+    const oreRows = mon.ores.map(oreName => {
+      const ore = oreMap[oreName];
+      if (!ore) return '';
+      const tags = ore.crystals.map(c => crystalTagHTML(c)).join('');
+      return `<div class="ore-row">
+        <div class="ore-name">${ore.name}</div>
+        <div class="ore-crystals">${tags}</div>
+      </div>`;
+    }).join('');
+
+    html += `<div class="monster-card" id="mc-${mon.id}">
+      <div class="monster-header" onclick="toggleCard('mc-${mon.id}')">
+        <span class="monster-icon">💀</span>
+        <div style="flex:1">
+          <div class="monster-name">${mon.name}</div>
+          <div class="monster-tc">${mon.id}</div>
+        </div>
+        <div class="monster-crystals-preview">${pips}</div>
+        <span class="monster-expand">▼</span>
+      </div>
+      <div class="monster-drops">
+        <div class="drop-group">
+          <div class="drop-group-title">Ore Drops (${mon.ores.length})</div>
+          ${oreRows}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// CRYSTAL VIEW
+// ============================================================
+function renderCrystalView(content) {
+  const search = state.search;
+
+  // Build crystal -> monsters list
+  const crystalMonsters = {};
+  Object.values(monsterMap).forEach(mon => {
+    mon.ores.forEach(oreName => {
+      const ore = oreMap[oreName];
+      if (!ore) return;
+      ore.crystals.forEach(crystal => {
+        const cid = crystal.stat;
+        if (!crystalMonsters[cid]) crystalMonsters[cid] = [];
+        if (!crystalMonsters[cid].find(e => e.mon.id === mon.id && e.ore.name === ore.name)) {
+          crystalMonsters[cid].push({ mon, ore, crystal });
+        }
+      });
+    });
+  });
+
+  const allCrystals = Object.keys(EMBEDDED.crystalInfo).sort();
+  const filtered = allCrystals.filter(cid => {
+    const name = crystalName(cid).toLowerCase();
+    if (search && !cid.includes(search) && !name.includes(search)) {
+      const hasMonster = (crystalMonsters[cid] || []).some(e => e.mon.name.toLowerCase().includes(search));
+      if (!hasMonster) return false;
+    }
+    if (state.crystalFilter.size > 0 && !state.crystalFilter.has(cid)) return false;
+    return true;
+  }).sort((a, b) => {
+    // Sort by number of monster sources descending
+    const diff = (crystalMonsters[b] || []).length - (crystalMonsters[a] || []).length;
+    if (diff !== 0) return diff;
+    return crystalName(a).localeCompare(crystalName(b));
+  });
+
+  let html = `<div class="results-header">
+    <h2>Crystal Sources</h2>
+    <span class="results-count">${filtered.length} type${filtered.length !== 1 ? 's' : ''}</span>
+  </div><div class="crystal-view">`;
+
+  filtered.forEach(cid => {
+    const color = crystalColor(cid);
+    const name = crystalName(cid);
+    const entries = crystalMonsters[cid] || [];
+    const primary = entries.filter(e => e.crystal.min > 1);
+    const secondary = entries.filter(e => e.crystal.min <= 1);
+
+    const monTags = (arr, isPrimary) => arr.map(e => {
+      const qty = e.crystal.min > 1 ? `${e.crystal.min}–${e.crystal.max}` : `0–${e.crystal.max}`;
+      return `<div class="monster-tag" onclick="switchToMonster('${e.mon.id}')">
+        ${isPrimary ? `<span class="primary-indicator"></span>` : ''}
+        ${e.mon.name} <span style="color:var(--text3);font-size:0.72rem">(${e.ore.name}, ×${qty})</span>
+      </div>`;
+    }).join('');
+
+    html += `<div class="crystal-section">
+      <div class="crystal-section-header">
+        <div class="crystal-dot-lg" style="background:${color}"></div>
+        <h3>${name} <span style="font-size:0.65rem;color:var(--text3);font-weight:400">${cid}</span></h3>
+        <span class="badge">${entries.length} source${entries.length !== 1 ? 's' : ''}</span>
+      </div>
+      <div class="crystal-section-body">
+        ${primary.length > 0 ? `<div class="drop-group-title" style="margin-bottom:8px">Primary Drop (guaranteed 2–4)</div>
+          <div class="monster-list">${monTags(primary, true)}</div>` : ''}
+        ${secondary.length > 0 ? `<div class="drop-group-title" style="margin:12px 0 8px">Bonus Drop (0–1 chance)</div>
+          <div class="monster-list">${monTags(secondary, false)}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// ORE VIEW
+// ============================================================
+function renderOreView(content) {
+  const search = state.search;
+  const cFilter = state.crystalFilter;
+
+  // Build ore -> monsters
+  const oreMonsters = {};
+  Object.values(monsterMap).forEach(mon => {
+    mon.ores.forEach(oreName => {
+      if (!oreMonsters[oreName]) oreMonsters[oreName] = [];
+      oreMonsters[oreName].push(mon.name);
+    });
+  });
+
+  const filtered = EMBEDDED.oreData.filter(ore => {
+    if (search && !ore.name.toLowerCase().includes(search)) return false;
+    if (cFilter.size > 0) {
+      if (!ore.crystals.some(c => cFilter.has(c.stat))) return false;
+    }
+    return true;
+  }).sort((a, b) => {
+    if (cFilter.size > 0) {
+      const diff = oreRelevanceScore(b) - oreRelevanceScore(a);
+      if (diff !== 0) return diff;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  let html = `<div class="results-header">
+    <h2>Ore Contents</h2>
+    <span class="results-count">${filtered.length} ore type${filtered.length !== 1 ? 's' : ''}</span>
+  </div>`;
+
+  filtered.forEach(ore => {
+    const tags = ore.crystals.map(c => crystalTagHTML(c)).join('');
+    const monsters = oreMonsters[ore.name] || [];
+    const monStr = monsters.length > 0
+      ? monsters.slice(0,6).join(', ') + (monsters.length > 6 ? ` +${monsters.length-6} more` : '')
+      : 'No monster sources found';
+
+    html += `<div class="ore-view-card">
+      <div class="ore-view-header">${ore.name}</div>
+      <div class="ore-view-body">
+        <div class="ore-view-crystals">${tags}</div>
+        <div class="ore-view-monsters">Dropped by: <span>${monStr}</span></div>
+      </div>
+    </div>`;
+  });
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// AREA VIEW
+// ============================================================
+// Ore 0-11 are "special" (4 crystals each, different combos per ore)
+// Ores 12-15 are "common" (6 crystals each, always present)
+const COMMON_ORES = new Set(['Uni Ore 12', 'Uni Ore 13', 'Uni Ore 14', 'Uni Ore 15']);
+
+function renderAreaView(content) {
+  const search = state.search;
+  const cFilter = state.crystalFilter;
+
+  const filtered = areaList.filter(area => {
+    if (search && !area.name.toLowerCase().includes(search)) {
+      // also check monster names
+      const hasMonster = area.monsters.some(mid => {
+        const mon = monsterMap[mid];
+        return mon && mon.name.toLowerCase().includes(search);
+      });
+      if (!hasMonster) return false;
+    }
+    if (cFilter.size > 0) {
+      // Area must have an ore containing the filtered crystal
+      let found = false;
+      for (const oreName of area.ores) {
+        const ore = oreMap[oreName];
+        if (ore && ore.crystals.some(c => cFilter.has(c.stat))) { found = true; break; }
+      }
+      if (!found) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    content.innerHTML = `<div class="empty-state">No areas match your filters.</div>`;
+    return;
+  }
+
+  // Sort: by relevance score when filter active, else special-ores-first then alphabetical
+  filtered.sort((a, b) => {
+    if (state.crystalFilter.size > 0) {
+      const diff = areaRelevanceScore(b) - areaRelevanceScore(a);
+      if (diff !== 0) return diff;
+    } else {
+      const aSpecial = a.ores.filter(o => !COMMON_ORES.has(o)).length;
+      const bSpecial = b.ores.filter(o => !COMMON_ORES.has(o)).length;
+      if (bSpecial !== aSpecial) return bSpecial - aSpecial;
+    }
+    return a.name.localeCompare(b.name);
+  });
+
+  let html = `<div class="results-header">
+    <h2>Areas</h2>
+    <span class="results-count">${filtered.length} area${filtered.length !== 1 ? 's' : ''}</span>
+  </div><div class="area-view">`;
+
+  // Group by whether they have special ores (only used when no filter active)
+  const withSpecial = filtered.filter(a => a.ores.some(o => !COMMON_ORES.has(o)));
+  const commonOnly  = filtered.filter(a => !a.ores.some(o => !COMMON_ORES.has(o)));
+
+  function renderArea(area) {
+    const specialOres = area.ores.filter(o => !COMMON_ORES.has(o)).sort();
+    const commonOres  = area.ores.filter(o => COMMON_ORES.has(o));
+
+    // Crystal pips — put filter matches first when filter is active
+    let areaCrystalIds = [...new Set(area.ores.flatMap(oreName => (oreMap[oreName]?.crystals || []).map(c => c.stat)))];
+    if (state.crystalFilter.size > 0) {
+      areaCrystalIds.sort((a, b) => (state.crystalFilter.has(b)?1:0) - (state.crystalFilter.has(a)?1:0));
+    }
+    const pips = areaCrystalIds.slice(0, 12).map(cid => {
+      const color = crystalColor(cid);
+      const highlight = state.crystalFilter.size > 0 && state.crystalFilter.has(cid);
+      return `<span class="crystal-pip" style="background:${color};box-shadow:0 0 4px ${color}60;${highlight?'outline:1px solid '+color+';transform:scale(1.35)':'opacity:0.4'}"></span>`;
+    }).join('');
+
+    const specialBadges = specialOres.map(o => `<span class="special-ore-badge">${o}</span>`).join('');
+
+    // Ore rows — relevant ores sorted first when filter active
+    let oreOrder = [...specialOres, ...commonOres];
+    if (state.crystalFilter.size > 0) {
+      oreOrder.sort((a, b) =>
+        oreRelevanceScore(oreMap[b]||{crystals:[]}) - oreRelevanceScore(oreMap[a]||{crystals:[]})
+      );
+    }
+    const oreRows = oreOrder.map(oreName => {
+      const ore = oreMap[oreName];
+      if (!ore) return '';
+      const isSpecial  = !COMMON_ORES.has(oreName);
+      const isRelevant = state.crystalFilter.size > 0 && ore.crystals.some(c => state.crystalFilter.has(c.stat));
+      const tags = ore.crystals.map(c => crystalTagHTML(c)).join('');
+      return `<div class="ore-row" style="${isSpecial?'background:rgba(200,160,60,0.04);border-left:2px solid var(--gold)40;padding-left:8px;':''}${isRelevant?'background:rgba(255,255,255,0.025);':'opacity:0.5;'}">
+        <div class="ore-name" style="${isSpecial?'color:var(--gold2)':''}">${ore.name}${isSpecial?' ★':''}</div>
+        <div class="ore-crystals">${tags}</div>
+      </div>`;
+    }).join('');
+
+    // Monsters in area
+    const monTags = area.monsters.map(mid => {
+      const mon = monsterMap[mid];
+      if (!mon) return '';
+      return `<span class="area-monster-tag" onclick="switchToMonster('${mid}')">${mon.name}</span>`;
+    }).join('');
+
+    return `<div class="area-card" id="ac-${area.name.replace(/[^a-z0-9]/gi,'_')}">
+      <div class="area-header" onclick="toggleAreaCard(this)">
+        <span class="area-icon">🗺</span>
+        <div style="flex:1">
+          <div class="area-name">${area.name}${specialBadges}</div>
+        </div>
+        <div class="monster-crystals-preview">${pips}</div>
+        <span class="area-expand">▼</span>
+      </div>
+      <div class="area-drops">
+        <div class="drop-group">
+          <div class="drop-group-title">Ores (${area.ores.length})</div>
+          ${oreRows}
+        </div>
+        <div class="area-monsters">
+          <div class="drop-group-title">Monsters (${area.monsters.length})</div>
+          <div class="area-monster-list">${monTags}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if (state.crystalFilter.size > 0) {
+    // Filter active: flat relevance-sorted list, no section grouping
+    filtered.forEach(area => html += renderArea(area));
+  } else {
+    if (withSpecial.length > 0) {
+      html += `<div class="act-header">Areas with special ores (${withSpecial.length})</div>`;
+      withSpecial.forEach(area => html += renderArea(area));
+    }
+    if (commonOnly.length > 0) {
+      html += `<div class="act-header" style="margin-top:16px">Standard areas (${commonOnly.length})</div>`;
+      commonOnly.forEach(area => html += renderArea(area));
+    }
+  }
+
+  html += `</div>`;
+  content.innerHTML = html;
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function toggleCard(id) {
+  document.getElementById(id)?.classList.toggle('open');
+}
+
+function toggleAreaCard(header) {
+  header.closest('.area-card').classList.toggle('open');
+}
+
+function switchToMonster(monsterId) {
+  state.view = 'monster';
+  state.search = monsterId;
+  document.getElementById('search').value = monsterId;
+  document.querySelectorAll('.filter-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === 0);
+  });
+  render();
+}
+
+// Init on load
+init();
+</script>
+</body>
+</html>
