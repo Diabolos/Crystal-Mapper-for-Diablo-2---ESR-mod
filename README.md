@@ -40,11 +40,11 @@ https://github.com/user-attachments/assets/8e9b8ac8-6e89-4616-ab49-3b1b7e869104
 ### Excel Sheets
 | File | Purpose |
 |------|---------|
-| `misc.txt` | Item definitions |
-| `treasureclassesex.txt` | Treasure class data |
-| `uniqueitems.txt` | Unique item data |
-| `itemstatcost.txt` | Item stat costs |
-| `monstats.txt` | Monster statistics |
+| `misc.txt` | Item data |
+| `treasureclassesex.txt` | Drop data |
+| `uniqueitems.txt` | Ores that contain crystals are considered unique items |
+| `itemstatcost.txt` | Crystal name cross-reference |
+| `monstats.txt` | Monster data |
 | `levels.txt` | Level/area data |
 
 ### Strings
